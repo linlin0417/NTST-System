@@ -16,18 +16,18 @@ onMounted(async () => {
   }
 })
 
-function statusColor(status: string) {
-  if (status === 'SUCCESS') return 'var(--success)'
-  if (status === 'FAILED') return 'var(--danger)'
-  if (status === 'RUNNING') return 'var(--warning)'
-  return 'var(--text-muted)'
-}
-
 function statusClass(status: string) {
   if (status === 'SUCCESS') return 'success'
   if (status === 'FAILED') return 'danger'
   if (status === 'RUNNING') return 'warning'
   return 'muted'
+}
+
+function statusText(status: string) {
+  const map: Record<string, string> = {
+    'SUCCESS': '成功', 'FAILED': '失敗', 'RUNNING': '執行中', 'PENDING': '等待中', 'MISSED': '錯過'
+  }
+  return map[status] || status
 }
 </script>
 
@@ -35,32 +35,32 @@ function statusClass(status: string) {
   <div class="data-page">
     <div class="page-header">
       <div>
-        <h2>Data Explorer</h2>
-        <p class="subtitle">Browse all collected data and execution history.</p>
+        <h2>資料瀏覽</h2>
+        <p class="subtitle">瀏覽所有收集的資料及執行紀錄。</p>
       </div>
     </div>
 
-    <div v-if="loading" class="empty-state glass">Loading data...</div>
+    <div v-if="loading" class="empty-state glass">載入資料中...</div>
 
     <div v-else-if="logs.length === 0" class="empty-state glass">
-      <p>No execution data found. Run a collector to start gathering data.</p>
+      <p>找不到執行資料。請執行收集器以開始收集資料。</p>
     </div>
 
     <div v-else class="table-wrapper glass">
       <table class="data-table">
         <thead>
           <tr>
-            <th>Status</th>
-            <th>Collector</th>
-            <th>Triggered</th>
-            <th>Completed</th>
+            <th>狀態</th>
+            <th>收集器</th>
+            <th>觸發時間</th>
+            <th>完成時間</th>
             <th>ID</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="log in logs" :key="log.id">
             <td>
-              <span class="status-pill" :class="statusClass(log.status)">{{ log.status }}</span>
+              <span class="status-pill" :class="statusClass(log.status)">{{ statusText(log.status) }}</span>
             </td>
             <td class="cell-name">{{ log.workflow?.name || '—' }}</td>
             <td class="cell-time">{{ new Date(log.trigger_time).toLocaleString('zh-TW') }}</td>

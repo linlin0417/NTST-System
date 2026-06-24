@@ -34,7 +34,7 @@ async function createCollector() {
     newName.value = ''
     newCron.value = ''
     newDesc.value = ''
-    // Refresh list
+    // 重新載入列表
     const res = await axios.get('/api/workflows')
     collectors.value = res.data
   } catch (err) {
@@ -48,21 +48,21 @@ async function createCollector() {
   <div class="collectors-page">
     <div class="page-header">
       <div>
-        <h2>Data Collectors</h2>
-        <p class="subtitle">Configure automated data collection tasks.</p>
+        <h2>資料收集器</h2>
+        <p class="subtitle">設定自動化資料收集任務。</p>
       </div>
       <button class="btn btn-accent" @click="showCreateModal = true">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        New Collector
+        新增收集器
       </button>
     </div>
 
-    <div v-if="loading" class="empty-state glass">Loading collectors...</div>
+    <div v-if="loading" class="empty-state glass">載入中...</div>
 
     <div v-else-if="collectors.length === 0" class="empty-state glass">
       <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1" style="color: var(--text-muted); margin-bottom: 12px;"><path d="M12 12l4-4"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="10"/></svg>
-      <p>No collectors configured yet.</p>
-      <button class="btn btn-accent" style="margin-top: 16px;" @click="showCreateModal = true">Create your first collector</button>
+      <p>尚未設定任何收集器。</p>
+      <button class="btn btn-accent" style="margin-top: 16px;" @click="showCreateModal = true">建立您的第一個收集器</button>
     </div>
 
     <div v-else class="collector-grid">
@@ -72,13 +72,13 @@ async function createCollector() {
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 12l4-4"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="10"/></svg>
           </div>
           <span class="card-badge" :class="c.is_active ? 'active' : 'inactive'">
-            {{ c.is_active ? 'Active' : 'Paused' }}
+            {{ c.is_active ? '執行中' : '已暫停' }}
           </span>
         </div>
         <h3 class="card-name">{{ c.name }}</h3>
-        <p class="card-desc">{{ c.description || 'No description' }}</p>
+        <p class="card-desc">{{ c.description || '無描述' }}</p>
         <div class="card-meta">
-          <span>Cron: {{ c.cron_expression || '—' }}</span>
+          <span>排程: {{ c.cron_expression || '無' }}</span>
         </div>
       </div>
     </div>
@@ -87,22 +87,22 @@ async function createCollector() {
     <Teleport to="body">
       <div v-if="showCreateModal" class="modal-overlay" @click.self="showCreateModal = false">
         <div class="modal glass">
-          <h3>New Data Collector</h3>
+          <h3>新增資料收集器</h3>
           <div class="form-group">
-            <label>Name</label>
-            <input v-model="newName" placeholder="e.g. Price Tracker" />
+            <label>名稱</label>
+            <input v-model="newName" placeholder="例如：價格追蹤器" />
           </div>
           <div class="form-group">
-            <label>Description</label>
-            <input v-model="newDesc" placeholder="What data does this collect?" />
+            <label>描述</label>
+            <input v-model="newDesc" placeholder="此收集器用於收集什麼資料？" />
           </div>
           <div class="form-group">
-            <label>Cron Expression</label>
-            <input v-model="newCron" placeholder="e.g. */30 * * * * (every 30 min)" />
+            <label>排程 (Cron Expression)</label>
+            <input v-model="newCron" placeholder="例如：*/30 * * * * (每 30 分鐘)" />
           </div>
           <div class="modal-actions">
-            <button class="btn btn-ghost" @click="showCreateModal = false">Cancel</button>
-            <button class="btn btn-accent" @click="createCollector">Create</button>
+            <button class="btn btn-ghost" @click="showCreateModal = false">取消</button>
+            <button class="btn btn-accent" @click="createCollector">建立</button>
           </div>
         </div>
       </div>

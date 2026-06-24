@@ -1,26 +1,27 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 
 const route = useRoute()
-const router = useRouter()
 const sidebarCollapsed = ref(false)
 
 const navItems = [
-  { path: '/', label: 'Overview', icon: 'grid' },
-  { path: '/collectors', label: 'Collectors', icon: 'radar' },
-  { path: '/data', label: 'Data Explorer', icon: 'layers' },
+  { path: '/', label: '總覽', icon: 'grid' },
+  { path: '/collectors', label: '收集器', icon: 'radar' },
+  { path: '/data', label: '資料瀏覽', icon: 'layers' },
 ]
 
 const currentTitle = computed(() => {
   const item = navItems.find(n => n.path === route.path)
   return item ? item.label : route.name?.toString() || 'NTST System'
 })
+
+const now = ref(new Date())
+setInterval(() => { now.value = new Date() }, 60000)
 </script>
 
 <template>
   <div class="shell">
-    <!-- Sidebar -->
     <aside class="sidebar" :class="{ collapsed: sidebarCollapsed }">
       <div class="sidebar-brand">
         <div class="brand-icon">
@@ -36,11 +37,8 @@ const currentTitle = computed(() => {
           class="nav-link"
           :class="{ active: route.path === item.path }"
         >
-          <!-- Grid icon -->
           <svg v-if="item.icon === 'grid'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-          <!-- Radar icon -->
           <svg v-if="item.icon === 'radar'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12l4-4"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="10"/></svg>
-          <!-- Layers icon -->
           <svg v-if="item.icon === 'layers'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
           <span class="nav-label" v-show="!sidebarCollapsed">{{ item.label }}</span>
         </router-link>
@@ -52,17 +50,16 @@ const currentTitle = computed(() => {
         </button>
         <div class="system-status" v-show="!sidebarCollapsed">
           <span class="pulse-dot"></span>
-          <span>System Active</span>
+          <span>系統運行中</span>
         </div>
       </div>
     </aside>
 
-    <!-- Main Area -->
     <div class="main-area">
       <header class="topbar glass">
         <h1 class="topbar-title">{{ currentTitle }}</h1>
         <div class="topbar-right">
-          <span class="topbar-time">{{ new Date().toLocaleDateString('zh-TW') }}</span>
+          <span class="topbar-time">{{ now.toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' }) }}</span>
         </div>
       </header>
 
@@ -88,7 +85,6 @@ const currentTitle = computed(() => {
     var(--bg-primary);
 }
 
-/* ── Sidebar ── */
 .sidebar {
   width: 240px;
   display: flex;
@@ -190,7 +186,6 @@ const currentTitle = computed(() => {
   50% { opacity: 0.4; }
 }
 
-/* ── Main Area ── */
 .main-area {
   flex: 1;
   display: flex;
