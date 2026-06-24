@@ -1,7 +1,8 @@
 import { prisma } from '../db';
 import { logger } from '../logger';
 import { enqueueExecution } from './throttle';
-import parser from 'cron-parser';
+import * as cron from 'cron-parser';
+const parseExpression = (cron as any).parseExpression || (cron as any).default?.parseExpression;
 
 export const startBootScanner = async () => {
     logger.info("Starting boot scanner...");
@@ -73,9 +74,9 @@ async function createPendingExecution(workflowId: string, triggerTime: Date) {
     enqueueExecution(exec.id);
 }
 
-function calculateNextRun(cronStr: string, from: Date): Date | null {
+export function calculateNextRun(cronStr: string, from: Date): Date | null {
     try {
-        const interval = parser.parseExpression(cronStr, { currentDate: from });
+        const interval = parseExpression(cronStr, { currentDate: from });
         return interval.next().toDate();
     } catch (err) {
         logger.error(`Invalid cron expression: ${cronStr}`);
@@ -83,10 +84,10 @@ function calculateNextRun(cronStr: string, from: Date): Date | null {
     }
 }
 
-function calculateMissedCounts(cronStr: string, lastRun: Date, now: Date): number {
+export function calculateMissedCounts(cronStr: string, lastRun: Date, now: Date): number {
     try {
         const options = { currentDate: lastRun, endDate: now };
-        const interval = parser.parseExpression(cronStr, options);
+        const interval = parseExpression(cronStr, options);
         let count = 0;
         while (true) {
             try {
@@ -98,6 +99,7 @@ function calculateMissedCounts(cronStr: string, lastRun: Date, now: Date): numbe
         }
         return count;
     } catch (err) {
+        console.error("calculateMissedCounts Error:", err);
         return 0;
     }
 }

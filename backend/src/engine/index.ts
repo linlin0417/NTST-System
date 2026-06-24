@@ -16,7 +16,7 @@ function createNodeInstance(nodeDef: any) {
     }
 }
 
-function topologicalSort(graph: ExecutionGraph): string[] {
+export function topologicalSort(graph: ExecutionGraph): string[] {
     const inDegree: { [id: string]: number } = {};
     const adj: { [id: string]: string[] } = {};
     const nodes = Object.keys(graph.nodes);

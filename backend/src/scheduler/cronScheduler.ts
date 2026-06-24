@@ -1,7 +1,8 @@
 import { prisma } from '../db';
 import { logger } from '../logger';
 import { enqueueExecution } from './throttle';
-import parser from 'cron-parser';
+import * as cron from 'cron-parser';
+const parseExpression = (cron as any).parseExpression || (cron as any).default?.parseExpression;
 
 let pollingInterval: NodeJS.Timeout;
 
@@ -44,7 +45,7 @@ async function pollWorkflows() {
 
         // Update next run time
         try {
-            const interval = parser.parseExpression(wf.cron_expression, { currentDate: now });
+            const interval = parseExpression(wf.cron_expression, { currentDate: now });
             const nextRun = interval.next().toDate();
             await prisma.workflow.update({
                 where: { id: wf.id },

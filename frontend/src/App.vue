@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { VueFlow, useVueFlow } from '@vue-flow/core'
+import axios from 'axios'
 import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
 
@@ -23,10 +24,16 @@ const edges = ref([
 
 onConnect((params) => addEdges(params))
 
-function exportFlow() {
-  const flow = { nodes: nodes.value, edges: edges.value }
-  console.log("Exported Workflow JSON:", JSON.stringify(flow, null, 2))
-  alert("已匯出流程至 Console！")
+async function exportFlow() {
+  try {
+    const flow = { name: 'My Local Workflow', nodes: nodes.value, edges: edges.value }
+    const res = await axios.post('/api/workflows', flow)
+    console.log("Saved successfully:", res.data)
+    alert("已成功匯出流程至後端 SQLite！")
+  } catch (e: any) {
+    console.error(e)
+    alert("匯出失敗: " + e.message)
+  }
 }
 </script>
 
