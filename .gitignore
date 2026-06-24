@@ -145,3 +145,4 @@ vite.config.ts.timestamp-*
 # dev
 .md/
 .antigravity/
+.docs/架構.md

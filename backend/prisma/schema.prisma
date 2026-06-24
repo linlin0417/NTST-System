@@ -1,0 +1,37 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Workflow {
+  id                String         @id @default(uuid())
+  name              String
+  description       String?
+  cron_expression   String?
+  next_run_time     DateTime?
+  catch_up_strategy String         @default("SKIP") // RUN_ONCE, RUN_ALL, SKIP
+  nodes_config      String         // Stored as JSON string
+  is_active         Boolean        @default(true)
+  created_at        DateTime       @default(now())
+  updated_at        DateTime       @updatedAt
+  executions        ExecutionLog[]
+}
+
+model ExecutionLog {
+  id           String    @id @default(uuid())
+  workflow_id  String
+  workflow     Workflow  @relation(fields: [workflow_id], references: [id], onDelete: Cascade)
+  status       String    @default("PENDING") // PENDING, RUNNING, SUCCESS, FAILED, MISSED
+  trigger_time DateTime
+  completed_at DateTime?
+  log_details  String?   // Stored as JSON string
+  created_at   DateTime  @default(now())
+}
